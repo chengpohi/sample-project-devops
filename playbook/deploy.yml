@@ -1,0 +1,21 @@
+---
+- hosts: dev 
+  vars:
+    pipeline_number: {{ lookup('env','BUILD_NUMBER') }}
+    download_folder: /apps/server
+    artificat_url: "http://10.202.129.81:8080/view/Roaster%20Pipeline/job/roaster_backend_build/{{ pipeline_number }}/artifact/target/universal/sample_project-0.1-1.noarch.rpm"
+    app_archive: "{{ download_folder }}/sample_project-0.1-1.noarch.rpm"
+  tasks:
+  - name: Create Server Directory
+    command: mkdir -p {{download_folder}}
+
+  - name: Download App
+    get_url: url={{ download_url }}  dest={{ app_archive }}  validate_certs=no owner=root group=root mode=744
+
+  - name: Uninstall sample_project
+    become: true
+    command: rpm -e sample_project-0.1-1.noarch
+
+  - name: Deploy sample_project
+    become: true
+    command: rpm -i {{ app_archive }}
