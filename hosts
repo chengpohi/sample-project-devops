@@ -1,2 +1,5 @@
+[jenkins]
+10.202.129.81  ansible_user=scaleworks
+
 [dev]
 10.202.128.166 ansible_user=scaleworks

@@ -1,0 +1,31 @@
+---
+- name: Install Filebeat
+  hosts: dev
+  become: true
+  tasks: 
+  - name: Elasticsearch YUM Repo
+    command: rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+  - name: Write YUM Repo
+    copy:
+      content: "[elasticsearch-5.x]\nname=Elasticsearch repository for 5.x packages\nbaseurl=https://artifacts.elastic.co/packages/5.x/yum\ngpgcheck=1\ngpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch\nenabled=1\nautorefresh=1\ntype=rpm-md"
+      dest:  /etc/yum.repos.d/elasticsearch.repo
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Install Filebeat
+    command: yum install -y filebeat
+
+  - name: Filebeat Service Start
+    command: service filebeat start
+
+  - name: Filebeat conf
+    copy:
+      src: "./properties/filebeat.yml"
+      dest: "/etc/filebeat/"
+      owner: root
+      group: root
+      mode: 0644
+
+

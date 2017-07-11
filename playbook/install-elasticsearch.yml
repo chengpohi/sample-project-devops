@@ -1,0 +1,51 @@
+---
+- name: Install Elasticsearch
+  hosts: jenkins
+  become: true
+  vars:
+  tasks:
+  - name: Elasticsearch YUM Repo
+    command: rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+  - name: Write YUM Repo
+    copy:
+      content: "[elasticsearch-5.x]\nname=Elasticsearch repository for 5.x packages\nbaseurl=https://artifacts.elastic.co/packages/5.x/yum\ngpgcheck=1\ngpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch\nenabled=1\nautorefresh=1\ntype=rpm-md"
+      dest:  /etc/yum.repos.d/elasticsearch.repo
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Install Elasticsearch
+    command: yum -y install elasticsearch
+
+  - name: Install Logstash
+    command: yum -y install logstash
+
+  - name: Install Kibana
+    command: yum -y install kibana
+
+  - name: Elasticsearch Service Start
+    command: service elasticsearch start
+
+  - name: Logstash conf
+    copy:
+      src: "./properties/logstash.conf"
+      dest: "/etc/logstash/conf.d/"
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Logstash conf
+    copy:
+      src: "./properties/kibana.yml"
+      dest: "/etc/kibana/"
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Logstash Service Start
+    command: service logstash start
+
+  - name: Kibana Service Start
+    command: service kibana start
+
