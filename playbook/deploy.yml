@@ -21,10 +21,16 @@
   - name: Stop Old Service
     command: service sample_project stop
 
+  - name: if sample_project installed
+    command: rpm -qa "sample_project"
+    register: rpm_check
+
   - name: Uninstall sample_project
     command: rpm -e sample_project-0.1-1.noarch
+    when: rpm_check.stdout.find('sample_project') != -1
 
   - name: Deploy sample_project
     command: rpm -i {{ app_archive }}
+
   - name: Delete Deployed RPM
     command: rm {{ app_archive }}
